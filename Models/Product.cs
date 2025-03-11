@@ -11,6 +11,5 @@
         public string? Condition { get; set; }
         public DateTime TimeLeft { get; set; }
         public bool IsSold { get; set; } = false;
-
     }
 }
