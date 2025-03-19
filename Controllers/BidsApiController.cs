@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using FormBudAdmin.Data;
 using FormBudAdmin.Models;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace FormBudAdmin.Controllers
 {
@@ -31,16 +32,18 @@ namespace FormBudAdmin.Controllers
 
         // GET: api/bid/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Bid>> GetBid(int id)
+        public async Task<ActionResult<IEnumerable<Bid>>> GetBid(int id)
         {
-            var bid = await _context.Bid.FindAsync(id);
+            var product = await _context.Product.FindAsync(id);
 
-            if (bid == null)
+            if (product == null)
             {
                 return NotFound();
             }
+            var bids = await _context.Bid.Where(b => b.ProductId == id).ToListAsync();
+            bids = bids.OrderBy(b => b.Price).ToList();
 
-            return bid;
+            return bids;
         }
 
         /*
@@ -61,6 +64,15 @@ namespace FormBudAdmin.Controllers
         {
             if(bidRequest == null) {
                 return BadRequest("BidRequest kan inte vara null");
+            }
+
+
+            var existingBid = await _context.Bid
+                .FirstOrDefaultAsync(b => b.ProductId == bidRequest.ProductId && b.Price > bidRequest.Price);
+            Console.WriteLine(existingBid);
+            if(existingBid != null)
+            {
+                return BadRequest("Budet måste vara högre än tidigare bud");
             }
 
             var buyer = await _context.Buyer
@@ -98,7 +110,7 @@ namespace FormBudAdmin.Controllers
             _context.Bid.Add(bid);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetBid", new { id = bid.Id }, bid);
+            return Created();
         }
 
        
