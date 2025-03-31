@@ -1,6 +1,6 @@
-﻿namespace FormBudAdmin.Models
+﻿namespace FormBudAdmin.ViewModels
 {
-    public class Product
+    public class CreateProductViewModel
     {
         //Properties
         public int Id { get; set; }
@@ -11,6 +11,6 @@
         public string? Condition { get; set; }
         public DateTime TimeLeft { get; set; }
         public bool IsSold { get; set; } = false;
-        public string? Image { get; set; }
+        public IFormFile Image { get; set; }
     }
 }

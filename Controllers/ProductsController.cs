@@ -7,16 +7,20 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FormBudAdmin.Data;
 using FormBudAdmin.Models;
+using FormBudAdmin.Interfaces;
+using FormBudAdmin.ViewModels;
 
 namespace FormBudAdmin.Controllers
 {
     public class ProductsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IPhotoService _photoService;
 
-        public ProductsController(ApplicationDbContext context)
+        public ProductsController(ApplicationDbContext context, IPhotoService photoService)
         {
             _context = context;
+            _photoService = photoService;
         }
 
         // GET: Products
@@ -52,6 +56,7 @@ namespace FormBudAdmin.Controllers
         // POST: Products/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        /*
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,ProductName,Description,Worth,MinPrice,Condition,TimeLeft,IsSold")] Product product)
@@ -63,6 +68,35 @@ namespace FormBudAdmin.Controllers
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
+        }
+        */
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(CreateProductViewModel productImg)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _photoService.AddPhotoAsync(productImg.Image);
+
+                var product = new Product
+                {
+                    ProductName = productImg.ProductName,
+                    Worth = productImg.Worth,
+                    MinPrice = productImg.MinPrice,
+                    Condition = productImg.Condition,
+                    TimeLeft = productImg.TimeLeft,
+                    IsSold = productImg.IsSold,
+                    Image = result.Url.ToString()
+                };
+                _context.Add(product);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            } else
+            {
+                ModelState.AddModelError("", "Det gick inte att ladda upp bild");
+            }
+                return View(productImg);
         }
 
         // GET: Products/Edit/5
