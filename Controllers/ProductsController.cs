@@ -40,6 +40,15 @@ namespace FormBudAdmin.Controllers
                 return NotFound();
             }
 
+            //Hämtar bids under product details
+            var bids = await _context.Bid
+                .Include(b => b.Buyer)
+                .Where(b => b.ProductId == id)
+                .ToListAsync();
+            bids = bids.OrderBy(b => b.Price).ToList();
+
+            ViewData["Bids"] = bids;
+
             return View(product);
         }
 
@@ -124,6 +133,9 @@ namespace FormBudAdmin.Controllers
                 return NotFound();
             }
 
+
+
+
             var product = await _context.Product
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (product == null)
@@ -139,6 +151,12 @@ namespace FormBudAdmin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+
+            //Ta bort bud innan produkt tas bort
+            //
+            //
+            //
+
             var product = await _context.Product.FindAsync(id);
             if (product != null)
             {
