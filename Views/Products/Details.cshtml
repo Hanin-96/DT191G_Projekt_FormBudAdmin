@@ -55,16 +55,20 @@
                 @Html.DisplayFor(model => model.IsSold)
             </dd>
         </dl>
-        <dl class="product-bid">
+        <div class="product-bid">
             @if (bids != null && bids.Count > 0)
             {
-                <dt class="col-sm-2">Alla bud</dt>
+                <div class="col-sm-2">Alla bud</div>
                 @foreach (Bid bid in bids)
                 {
-                    <dd class="col-sm-10">@bid.Price [@bid.Buyer?.BuyerPhone]</dd>
+                    <p class="col-sm-10">@bid.Price [@bid.Buyer?.BuyerPhone]</p>
+                    <form asp-action="DeleteBid">
+                        <input type="hidden" value="@bid.Id" name="id"/>
+                        <input type="submit" value="Delete" class="btn btn-danger" /> 
+                    </form>
                 }
             }
-        </dl>
+        </div>
     </div>
 </div>
 <div>

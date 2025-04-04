@@ -139,6 +139,14 @@ namespace FormBudAdmin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+
+            //Ta bort alla bud innan köpare tas bort
+            var bids = await _context.Bid.Where(b => b.ProductId == id).ToListAsync();
+            if (bids != null && bids.Count > 0)
+            {
+                _context.Bid.RemoveRange(bids);
+            }
+
             var buyer = await _context.Buyer.FindAsync(id);
             if (buyer != null)
             {

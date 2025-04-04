@@ -151,11 +151,12 @@ namespace FormBudAdmin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-
-            //Ta bort bud innan produkt tas bort
-            //
-            //
-            //
+            //Ta bort alla bud innan produkt tas bort
+            var bids = await _context.Bid.Where(b => b.ProductId == id).ToListAsync();
+            if (bids != null && bids.Count > 0)
+            {
+                _context.Bid.RemoveRange(bids);
+            }
 
             var product = await _context.Product.FindAsync(id);
             if (product != null)
@@ -165,6 +166,29 @@ namespace FormBudAdmin.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        // POST: Products/Delete/5
+        [HttpPost, ActionName("DeleteBid")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteBid(int id)
+        {
+            Console.WriteLine("id är hämtad " + id);
+            //Ta bort alla bud innan produkt tas bort
+            var bid = await _context.Bid.FindAsync(id);
+
+            Console.WriteLine("Bud är hämtad");
+            if (bid != null)
+            {
+                _context.Bid.Remove(bid);
+                Console.WriteLine("Bud är borttagen");
+            }
+
+            int productId = bid?.ProductId ?? 0;
+
+            await _context.SaveChangesAsync();
+            //Redirect till produktsida detaljer
+            return RedirectToAction("Details", new { id = productId });
         }
 
         private bool ProductExists(int id)
