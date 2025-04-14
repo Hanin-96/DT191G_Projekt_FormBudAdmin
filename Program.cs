@@ -11,6 +11,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
@@ -48,5 +49,34 @@ app.MapControllerRoute(
 
 app.MapRazorPages()
    .WithStaticAssets();
+
+//Skapa roller/användare
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    //Skapa admin roll
+    string role = "Admin";
+    if (!await roleManager.RoleExistsAsync(role))
+    {
+        await roleManager.CreateAsync(new IdentityRole(role));
+    }
+
+    //Skapa admin användare
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+    var adminUser = new { Email = "formbud@gmail.com", Password = "Password123.", Role = "Admin" };
+
+    var identityUser = await userManager.FindByEmailAsync(adminUser.Email);
+    if (identityUser == null)
+    {
+        identityUser = new IdentityUser { UserName = adminUser.Email, Email = adminUser.Email };
+        await userManager.CreateAsync(identityUser, adminUser.Password);
+
+        //Tilldela roll
+        await userManager.AddToRoleAsync(identityUser, adminUser.Role);
+    }
+
+}
 
 app.Run();
