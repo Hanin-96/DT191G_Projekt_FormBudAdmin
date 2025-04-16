@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FormBudAdmin.Data;
 using FormBudAdmin.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FormBudAdmin.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class ProductsController : Controller
     {
         private readonly ApplicationDbContext _context;
