@@ -1,4 +1,7 @@
-﻿namespace FormBudAdmin.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace FormBudAdmin.Models
 {
     public class Product
     {
@@ -11,5 +14,9 @@
         public string? Condition { get; set; }
         public DateTime TimeLeft { get; set; }
         public bool IsSold { get; set; } = false;
+        //Filuppladdning
+        public string? ImageName { get; set; }
+        [NotMapped]
+        public IFormFile? ImageFile { get; set; }
     }
 }

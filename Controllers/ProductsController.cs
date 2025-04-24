@@ -16,9 +16,16 @@ namespace FormBudAdmin.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        public ProductsController(ApplicationDbContext context)
+        //Läsa ut sökväg
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly string wwwRootPath;
+
+        public ProductsController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            _webHostEnvironment = webHostEnvironment;
+            wwwRootPath = webHostEnvironment.WebRootPath;
+
         }
 
         // GET: Products
@@ -65,11 +72,31 @@ namespace FormBudAdmin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ProductName,Description,Worth,MinPrice,Condition,TimeLeft,IsSold")] Product product)
+        public async Task<IActionResult> Create([Bind("Id,ProductName,Description,Worth,MinPrice,Condition,TimeLeft,IsSold,ImageFile")] Product product)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(product);
+                Console.WriteLine(product.ImageFile);
+                //Kontrollera för img
+                if(product.ImageFile != null)
+                {
+                    //Generera filnamn
+                    string fileName = Path.GetFileNameWithoutExtension(product.ImageFile.FileName);
+                    string extension = Path.GetExtension(product.ImageFile.FileName);
+
+                    //Sparar ner i databasen
+                    product.ImageName = fileName = fileName.Replace(" ", String.Empty) + DateTime.Now.ToString("yymmhh") + extension;
+                    string path = Path.Combine(wwwRootPath + "/images", fileName);
+                    using (var fileStream = new FileStream(path, FileMode.Create))
+                    {
+                        await product.ImageFile.CopyToAsync(fileStream);
+                    }
+                } else
+                {
+                    product.ImageName = "placeholder.jpg";
+                }
+
+                    _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
