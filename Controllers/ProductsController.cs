@@ -78,7 +78,7 @@ namespace FormBudAdmin.Controllers
             {
                 Console.WriteLine(product.ImageFile);
                 //Kontrollera för img
-                if(product.ImageFile != null)
+                if (product.ImageFile != null)
                 {
                     //Generera filnamn
                     string fileName = Path.GetFileNameWithoutExtension(product.ImageFile.FileName);
@@ -91,12 +91,13 @@ namespace FormBudAdmin.Controllers
                     {
                         await product.ImageFile.CopyToAsync(fileStream);
                     }
-                } else
+                }
+                else
                 {
                     product.ImageName = "placeholder.jpg";
                 }
 
-                    _context.Add(product);
+                _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -135,6 +136,14 @@ namespace FormBudAdmin.Controllers
             {
                 try
                 {
+                    // Hämtar original produkten för att se till så att den inte skriver över ImageName med null.
+                    var existingProduct = await _context.Product.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+                    if (existingProduct == null)
+                    {
+                        return NotFound();
+                    }
+
+                    product.ImageName = existingProduct.ImageName;
                     _context.Update(product);
                     await _context.SaveChangesAsync();
                 }
