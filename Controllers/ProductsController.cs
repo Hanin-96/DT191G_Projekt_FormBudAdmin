@@ -84,7 +84,7 @@ namespace FormBudAdmin.Controllers
                     string fileName = Path.GetFileNameWithoutExtension(product.ImageFile.FileName);
                     string extension = Path.GetExtension(product.ImageFile.FileName);
 
-                    //Sparar ner i databasen
+                    //Sparar ner
                     product.ImageName = fileName = fileName.Replace(" ", String.Empty) + DateTime.Now.ToString("yymmhh") + extension;
                     string path = Path.Combine(wwwRootPath + "/images", fileName);
                     using (var fileStream = new FileStream(path, FileMode.Create))

@@ -25,9 +25,6 @@ namespace FormBudAdmin.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProduct()
         {
-      
-
-
             return await _context.Product.ToListAsync();
         }
 

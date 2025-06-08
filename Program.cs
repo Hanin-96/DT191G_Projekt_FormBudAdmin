@@ -50,7 +50,7 @@ app.MapControllerRoute(
 app.MapRazorPages()
    .WithStaticAssets();
 
-//Skapa roller/anv�ndare
+//Skapa roller/användare
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -62,7 +62,7 @@ using (var scope = app.Services.CreateScope())
         await roleManager.CreateAsync(new IdentityRole(role));
     }
 
-    //Skapa admin anv�ndare
+    //Skapa admin användare
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
     var adminUser = new { Email = "formbud@gmail.com", Password = "Password123.", Role = "Admin" };

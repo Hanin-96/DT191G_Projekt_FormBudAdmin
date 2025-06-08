@@ -35,14 +35,12 @@ namespace FormBudAdmin.Controllers
         public async Task<ActionResult<IEnumerable<Bid>>> GetBid(int id)
         {
             var product = await _context.Product.FindAsync(id);
-
             if (product == null)
             {
                 return NotFound();
             }
             var bids = await _context.Bid.Where(b => b.ProductId == id).ToListAsync();
             bids = bids.OrderBy(b => b.Price).ToList();
-
             return bids;
         }
 
